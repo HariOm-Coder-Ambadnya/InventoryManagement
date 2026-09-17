@@ -106,6 +106,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/admin/shipping/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/admin/shipping/{id}/status").hasRole("ADMIN")
 
+                        // Admin dashboard and reports - ADMIN only
+                        .requestMatchers(HttpMethod.GET, "/api/admin/dashboard").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/reports/**").hasRole("ADMIN")
+
                         // Everything else requires authentication
                         .anyRequest().authenticated()
                 )

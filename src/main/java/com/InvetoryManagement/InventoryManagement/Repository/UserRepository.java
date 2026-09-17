@@ -1,5 +1,6 @@
 package com.InvetoryManagement.InventoryManagement.Repository;
 
+import com.InvetoryManagement.InventoryManagement.Entity.Role;
 import com.InvetoryManagement.InventoryManagement.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,4 +11,8 @@ public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    long countByRole(Role role);
+
+    long countByActive(boolean active);
 }
