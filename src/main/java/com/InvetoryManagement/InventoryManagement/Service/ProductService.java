@@ -1,45 +1,37 @@
 package com.InvetoryManagement.InventoryManagement.Service;
 
 import com.InvetoryManagement.InventoryManagement.Entity.Product;
+import com.InvetoryManagement.InventoryManagement.Exception.ResourceNotFoundException;
 import com.InvetoryManagement.InventoryManagement.Repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
 
-
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
-    public Product getProductById(String id){
-        Optional<Product> product = productRepository.findById(id);
-
-        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product no found"));
+    public Product getProductById(String id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
     }
 
-    public List<Product> getProductByCategory(String category){
+    public List<Product> getProductByCategory(String category) {
         return productRepository.findByCategory(category);
     }
 
-    public List<Product> getallProduct(){
+    public List<Product> getallProduct() {
         return productRepository.findAll();
     }
 
     public Product updateProduct(String id, Product updatedproduct) {
-
         Product product = productRepository.findById(id)
-                .orElse(null);
-
-        if (product == null) {
-            return null;
-        }
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
 
         product.setName(updatedproduct.getName());
         product.setCategory(updatedproduct.getCategory());
@@ -49,22 +41,15 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public String deleteProduct (String id){
-
-        Product deleteproduct = productRepository.findById(id).orElse(null);
-
-        if(deleteproduct == null){
-            return null;
-        }
+    public String deleteProduct(String id) {
+        Product deleteproduct = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
 
         productRepository.deleteById(id);
-
         return "Deleted";
     }
 
-    public Product addProduct(Product product){
-
+    public Product addProduct(Product product) {
         return productRepository.save(product);
     }
-
 }

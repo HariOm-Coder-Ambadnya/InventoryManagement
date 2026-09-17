@@ -4,6 +4,8 @@ import com.InvetoryManagement.InventoryManagement.DTO.StockRequest;
 import com.InvetoryManagement.InventoryManagement.Entity.Product;
 import com.InvetoryManagement.InventoryManagement.Entity.StockHistory;
 import com.InvetoryManagement.InventoryManagement.Entity.StockType;
+import com.InvetoryManagement.InventoryManagement.Exception.BadRequestException;
+import com.InvetoryManagement.InventoryManagement.Exception.ResourceNotFoundException;
 import com.InvetoryManagement.InventoryManagement.Repository.ProductRepository;
 import com.InvetoryManagement.InventoryManagement.Repository.StockHistoryRepository;
 import org.springframework.stereotype.Service;
@@ -23,18 +25,13 @@ public class InventoryService {
         this.stockHistoryRepository = stockHistoryRepository;
     }
 
-    public StockHistory updateStock(String productId,
-                                    StockRequest request) {
+    public StockHistory updateStock(String productId, StockRequest request) {
 
         Product product = productRepository.findById(productId)
-                .orElse(null);
-
-        if (product == null) {
-            return null;
-        }
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
 
         if (request.getQuantity() <= 0) {
-            throw new RuntimeException("Quantity must be greater than 0");
+            throw new BadRequestException("Quantity must be greater than 0");
         }
 
         int currentQuantity = product.getQuantity();
@@ -42,19 +39,15 @@ public class InventoryService {
         if (request.getType() == StockType.STOCK_IN
                 || request.getType() == StockType.RETURN) {
 
-            product.setQuantity(
-                    currentQuantity + request.getQuantity()
-            );
+            product.setQuantity(currentQuantity + request.getQuantity());
 
         } else {
 
             if (currentQuantity < request.getQuantity()) {
-                throw new RuntimeException("Insufficient stock");
+                throw new BadRequestException("Insufficient stock");
             }
 
-            product.setQuantity(
-                    currentQuantity - request.getQuantity()
-            );
+            product.setQuantity(currentQuantity - request.getQuantity());
         }
 
         productRepository.save(product);
@@ -70,12 +63,10 @@ public class InventoryService {
     }
 
     public List<StockHistory> getProductStockHistory(String productId) {
-
         return stockHistoryRepository.findByProductId(productId);
     }
 
     public List<StockHistory> getAllStockHistory() {
-
         return stockHistoryRepository.findAll();
     }
 }

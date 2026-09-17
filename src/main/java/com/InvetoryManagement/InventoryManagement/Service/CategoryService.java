@@ -1,6 +1,7 @@
 package com.InvetoryManagement.InventoryManagement.Service;
 
 import com.InvetoryManagement.InventoryManagement.Entity.Category;
+import com.InvetoryManagement.InventoryManagement.Exception.ResourceNotFoundException;
 import com.InvetoryManagement.InventoryManagement.Repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,31 +15,22 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    // Create category
     public Category addCategory(Category category) {
         return categoryRepository.save(category);
     }
 
-    // Get all categories
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
 
-    // Get category by ID
     public Category getCategoryById(String id) {
         return categoryRepository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     }
 
-    // Update category
     public Category updateCategory(String id, Category updatedCategory) {
-
         Category category = categoryRepository.findById(id)
-                .orElse(null);
-
-        if (category == null) {
-            return null;
-        }
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
 
         category.setName(updatedCategory.getName());
         category.setDescription(updatedCategory.getDescription());
@@ -47,8 +39,9 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
-    // Delete category
     public void deleteCategory(String id) {
+        categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
         categoryRepository.deleteById(id);
     }
 }

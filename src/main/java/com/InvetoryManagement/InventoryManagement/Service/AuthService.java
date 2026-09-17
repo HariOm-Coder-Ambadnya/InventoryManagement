@@ -4,6 +4,9 @@ import com.InvetoryManagement.InventoryManagement.DTO.LoginRequest;
 import com.InvetoryManagement.InventoryManagement.DTO.RegisterRequest;
 import com.InvetoryManagement.InventoryManagement.Entity.Role;
 import com.InvetoryManagement.InventoryManagement.Entity.User;
+import com.InvetoryManagement.InventoryManagement.Exception.BadRequestException;
+import com.InvetoryManagement.InventoryManagement.Exception.ResourceNotFoundException;
+import com.InvetoryManagement.InventoryManagement.Exception.UnauthorizedException;
 import com.InvetoryManagement.InventoryManagement.Repository.UserRepository;
 import com.InvetoryManagement.InventoryManagement.Security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +31,7 @@ public class AuthService {
     public User register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new BadRequestException("Email already registered");
         }
 
         User user = User.builder()
@@ -46,17 +49,17 @@ public class AuthService {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
-                        new RuntimeException("Invalid email or password"));
+                        new UnauthorizedException("Invalid email or password"));
 
         if (!user.isActive()) {
-            throw new RuntimeException("User account is inactive");
+            throw new UnauthorizedException("User account is inactive");
         }
 
         if (!passwordEncoder.matches(
                 request.getPassword(),
                 user.getPassword())) {
 
-            throw new RuntimeException("Invalid email or password");
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         return jwtService.generateToken(
@@ -69,6 +72,6 @@ public class AuthService {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new ResourceNotFoundException("User not found"));
     }
 }
