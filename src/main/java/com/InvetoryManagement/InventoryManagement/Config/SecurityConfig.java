@@ -86,6 +86,26 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/admin/orders/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/admin/orders/{id}/status").hasRole("ADMIN")
 
+                        // Payments - CUSTOMER only
+                        .requestMatchers(HttpMethod.POST, "/api/payments").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/payments/{id}").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/payments/order/{orderId}").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.POST, "/api/payments/{paymentId}/process").hasRole("CUSTOMER")
+
+                        // Admin payment management - ADMIN only
+                        .requestMatchers(HttpMethod.GET, "/api/admin/payments").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/payments/{id}").hasRole("ADMIN")
+
+                        // Shipping - CUSTOMER only
+                        .requestMatchers(HttpMethod.POST, "/api/shipping").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/shipping/{id}").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/shipping/order/{orderId}").hasRole("CUSTOMER")
+
+                        // Admin shipping management - ADMIN only
+                        .requestMatchers(HttpMethod.GET, "/api/admin/shipping").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/shipping/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/admin/shipping/{id}/status").hasRole("ADMIN")
+
                         // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
